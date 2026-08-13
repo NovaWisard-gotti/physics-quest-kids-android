@@ -26,17 +26,20 @@ object LeverEngine {
     )
 
     fun evaluate(input: LeverInput, config: TargetConfig): PuzzleResult {
-        val fulcrum = input.fulcrumPosition.coerceIn(0.01f, 0.99f)
-        val loadArm = abs(fulcrum - config.loadPosition)
-        val effortArm = abs(config.effortPosition - fulcrum)
+        val rawLoadArm = abs(input.fulcrumPosition - config.loadPosition)
+        val rawEffortArm = abs(config.effortPosition - input.fulcrumPosition)
 
-        if (loadArm <= 0.001f || effortArm <= 0.001f) {
+        if (rawLoadArm <= 0.01f || rawEffortArm <= 0.01f) {
             return PuzzleResult(
                 success = false,
                 efficiencyScore = 0f,
                 feedbackMessage = "El punto de apoyo está demasiado cerca de un extremo. Muévelo hacia el centro."
             )
         }
+
+        val fulcrum = input.fulcrumPosition.coerceIn(0.01f, 0.99f)
+        val loadArm = abs(fulcrum - config.loadPosition)
+        val effortArm = abs(config.effortPosition - fulcrum)
 
         val requiredEffort = (config.loadWeight * loadArm) / effortArm
         val success = input.effortForce >= requiredEffort && input.effortForce <= 1f
