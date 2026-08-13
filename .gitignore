@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+app/build/
+
+# Local configuration
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.DS_Store
+captures/
+
+# Wrapper distribution cache (no se versiona; se descarga al compilar)
+gradle/wrapper/dists/
+
+# Logs
+*.log
