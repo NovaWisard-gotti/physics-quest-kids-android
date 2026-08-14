@@ -19,9 +19,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kidslab.physicsquest.ui.common.QuestTopBar
 
 @Composable
-fun InventoryScreen(viewModel: InventoryViewModel) {
+fun InventoryScreen(viewModel: InventoryViewModel, onBack: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
 
     if (state.loading) {
@@ -30,7 +31,7 @@ fun InventoryScreen(viewModel: InventoryViewModel) {
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item { Text("🎒 Inventario y logros", style = MaterialTheme.typography.headlineMedium) }
+        item { QuestTopBar(title = "🎒 Inventario y logros", onBack = onBack) }
 
         item { Text("Insignias (${state.badges.count { it.earned }}/${state.badges.size})", style = MaterialTheme.typography.titleLarge) }
         items(state.badges) { item ->

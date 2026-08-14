@@ -20,12 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import com.kidslab.physicsquest.ui.theme.CoralAccent
+import com.kidslab.physicsquest.ui.common.QuestTopBar
 
 @Composable
 fun BossScreen(
     viewModel: BossViewModel,
-    onStartChallenge: (Long) -> Unit
+    onStartChallenge: (Long) -> Unit,
+    onBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -40,7 +41,7 @@ fun BossScreen(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("👑 Jefe científico", style = MaterialTheme.typography.headlineMedium, color = CoralAccent)
+        QuestTopBar(title = "👑 Jefe científico", onBack = onBack)
         Text(boss.title, style = MaterialTheme.typography.titleLarge)
 
         Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f))) {

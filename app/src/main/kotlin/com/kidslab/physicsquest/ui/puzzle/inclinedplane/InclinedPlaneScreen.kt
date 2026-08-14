@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.kidslab.physicsquest.ui.common.FeedbackBanner
 import com.kidslab.physicsquest.ui.common.HintButton
+import com.kidslab.physicsquest.ui.common.QuestTopBar
 import com.kidslab.physicsquest.ui.common.StarsRow
 import androidx.compose.ui.unit.dp
 
@@ -42,7 +43,7 @@ fun InclinedPlaneScreen(
         modifier = Modifier.fillMaxSize().padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(state.title, style = MaterialTheme.typography.headlineMedium)
+        QuestTopBar(title = state.title, onBack = onBack)
         Text(state.instructions, style = MaterialTheme.typography.bodyLarge)
 
         state.ramps.forEach { ramp ->

@@ -105,7 +105,8 @@ fun PhysicsQuestNavHost(repository: PhysicsQuestRepository) {
             WorldLevelsScreen(
                 viewModel = vm,
                 onOpenLevel = { levelId -> navController.navigate(Routes.puzzle(levelId)) },
-                onOpenBoss = { navController.navigate(Routes.boss(worldId)) }
+                onOpenBoss = { navController.navigate(Routes.boss(worldId)) },
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -115,7 +116,11 @@ fun PhysicsQuestNavHost(repository: PhysicsQuestRepository) {
         ) { backStackEntry ->
             val worldId = backStackEntry.arguments?.getLong("worldId") ?: return@composable
             val vm: BossViewModel = viewModel(factory = BossViewModel.Factory(repository, worldId))
-            BossScreen(viewModel = vm, onStartChallenge = { levelId -> navController.navigate(Routes.puzzle(levelId)) })
+            BossScreen(
+                viewModel = vm,
+                onStartChallenge = { levelId -> navController.navigate(Routes.puzzle(levelId)) },
+                onBack = { navController.popBackStack() }
+            )
         }
 
         composable(
@@ -157,7 +162,7 @@ fun PhysicsQuestNavHost(repository: PhysicsQuestRepository) {
 
         composable(Routes.INVENTORY) {
             val vm: InventoryViewModel = viewModel(factory = InventoryViewModel.Factory(repository, userProfileId))
-            InventoryScreen(viewModel = vm)
+            InventoryScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
     }
 }

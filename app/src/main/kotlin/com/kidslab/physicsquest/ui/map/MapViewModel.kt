@@ -8,6 +8,7 @@ import com.kidslab.physicsquest.domain.repository.PhysicsQuestRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 data class WorldMapItem(val world: World, val starsEarned: Int, val maxStars: Int, val unlocked: Boolean)
@@ -30,23 +31,29 @@ class MapViewModel(
 
     fun load() {
         viewModelScope.launch {
-            val worlds = mutableListOf<World>()
-            repository.observeWorlds().collect { fetched ->
-                worlds.clear()
-                worlds.addAll(fetched.sortedBy { it.order })
+            // Se combinan mundos, niveles y progreso como flujos reactivos (en vez de
+            // consultas puntuales) para que las estrellas se actualicen al instante al
+            // volver de un nivel, sin necesitar reiniciar la app.
+            combine(
+                repository.observeWorlds(),
+                repository.observeAllLevels(),
+                repository.observeProgressForUser(userProfileId)
+            ) { fetchedWorlds, levels, progress ->
+                val sortedWorlds = fetchedWorlds.sortedBy { it.order }
+                val starsByLevel = progress.associate { it.levelId to it.stars }
+                val starsByWorld = levels.groupBy { it.worldId }
+                    .mapValues { (_, lvls) -> lvls.sumOf { starsByLevel[it.id] ?: 0 } }
+
                 val items = mutableListOf<WorldMapItem>()
                 var previousStars = Int.MAX_VALUE
-                for (world in worlds) {
-                    val stars = repository.sumStarsForWorld(userProfileId, world.id)
+                for (world in sortedWorlds) {
+                    val stars = starsByWorld[world.id] ?: 0
                     val unlocked = WorldUnlockPolicy.isUnlocked(world.order, world.starsRequiredToUnlock, previousStars)
                     items += WorldMapItem(world, stars, maxStars = 18, unlocked = unlocked)
                     previousStars = stars
                 }
-                val total = repository.sumStarsForWorld(userProfileId, worlds.getOrNull(0)?.id ?: -1L).let { _ ->
-                    items.sumOf { it.starsEarned }
-                }
-                _uiState.value = MapUiState(loading = false, totalStars = total, worlds = items)
-            }
+                MapUiState(loading = false, totalStars = items.sumOf { it.starsEarned }, worlds = items)
+            }.collect { _uiState.value = it }
         }
     }
 

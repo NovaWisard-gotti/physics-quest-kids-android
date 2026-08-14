@@ -4,11 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -24,8 +27,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kidslab.physicsquest.ui.common.StarsRow
+import com.kidslab.physicsquest.ui.theme.CoralAccent
+import com.kidslab.physicsquest.ui.theme.LeafGreen
+import com.kidslab.physicsquest.ui.theme.SpaceBluePrimary
+import com.kidslab.physicsquest.ui.theme.SunshineYellow
+import com.kidslab.physicsquest.ui.theme.VioletAccent
+
+// Un color distinto por mundo: ayuda a los niños a reconocer cada mundo de un
+// vistazo, en vez de que todas las tarjetas se vean iguales.
+private val WorldAccentColors = listOf(SpaceBluePrimary, CoralAccent, LeafGreen, VioletAccent, SunshineYellow)
 
 @Composable
 fun MapScreen(
@@ -46,6 +59,7 @@ fun MapScreen(
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(state.worlds) { item ->
+                val accent = WorldAccentColors[(item.world.order - 1).mod(WorldAccentColors.size)]
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -55,18 +69,33 @@ fun MapScreen(
                     ),
                     onClick = { if (item.unlocked) onOpenWorld(item.world.id) }
                 ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Mundo ${item.world.order}: ${item.world.title}", style = MaterialTheme.typography.titleLarge)
-                        Text(item.world.subtitle, style = MaterialTheme.typography.bodyMedium)
-                        Text(item.world.description, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 4.dp))
-                        StarsRow(minOf(item.starsEarned, 3), modifier = Modifier.padding(top = 8.dp))
-                        Text("${item.starsEarned} / ${item.maxStars} estrellas del mundo", style = MaterialTheme.typography.bodyMedium)
-                        if (!item.unlocked) {
-                            Text(
-                                "🔒 Necesitas ${item.world.starsRequiredToUnlock} estrellas en el mundo anterior",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.error
-                            )
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(if (item.unlocked) accent else Color.Gray.copy(alpha = 0.4f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (item.unlocked) {
+                                Text("${item.world.order}", color = Color.White, style = MaterialTheme.typography.titleLarge)
+                            } else {
+                                Icon(Icons.Filled.Lock, contentDescription = "Mundo bloqueado", tint = Color.White, modifier = Modifier.size(20.dp))
+                            }
+                        }
+                        Column(Modifier.padding(start = 12.dp)) {
+                            Text(item.world.title, style = MaterialTheme.typography.titleLarge)
+                            Text(item.world.subtitle, style = MaterialTheme.typography.bodyMedium)
+                            Text(item.world.description, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 4.dp))
+                            StarsRow(minOf(item.starsEarned, 3), modifier = Modifier.padding(top = 8.dp))
+                            Text("${item.starsEarned} / ${item.maxStars} estrellas del mundo", style = MaterialTheme.typography.bodyMedium)
+                            if (!item.unlocked) {
+                                Text(
+                                    "🔒 Necesitas ${item.world.starsRequiredToUnlock} estrellas en el mundo anterior",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
                     }
                 }

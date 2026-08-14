@@ -42,6 +42,7 @@ class PhysicsQuestRepositoryImpl(private val db: PhysicsQuestDatabase) : Physics
     override fun observeWorlds(): Flow<List<World>> = db.worldDao().observeAll()
     override suspend fun getWorld(worldId: Long): World? = db.worldDao().getById(worldId)
     override fun observeLevelsForWorld(worldId: Long): Flow<List<Level>> = db.levelDao().observeLevelsForWorld(worldId)
+    override fun observeAllLevels(): Flow<List<Level>> = db.levelDao().observeAll()
     override suspend fun getLevel(levelId: Long): Level? = db.levelDao().getLevel(levelId)
     override suspend fun getObjectsForLevel(levelId: Long): List<LevelObject> = db.levelDao().getObjectsForLevel(levelId)
     override suspend fun getRulesForLevel(levelId: Long): List<LevelRule> = db.levelDao().getRulesForLevel(levelId)

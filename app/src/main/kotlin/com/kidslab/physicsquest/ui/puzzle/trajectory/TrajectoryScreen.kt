@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.kidslab.physicsquest.ui.common.FeedbackBanner
 import com.kidslab.physicsquest.ui.common.HintButton
+import com.kidslab.physicsquest.ui.common.QuestTopBar
 import com.kidslab.physicsquest.ui.common.StarsRow
 import com.kidslab.physicsquest.ui.theme.CoralAccent
 import com.kidslab.physicsquest.ui.theme.LeafGreen
@@ -50,7 +51,7 @@ fun TrajectoryScreen(
         modifier = Modifier.fillMaxSize().padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(state.title, style = MaterialTheme.typography.headlineMedium)
+        QuestTopBar(title = state.title, onBack = onBack)
         Text(state.instructions, style = MaterialTheme.typography.bodyLarge)
 
         Card(

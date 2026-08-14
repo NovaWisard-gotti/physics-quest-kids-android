@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kidslab.physicsquest.ui.common.FeedbackBanner
 import com.kidslab.physicsquest.ui.common.HintButton
+import com.kidslab.physicsquest.ui.common.QuestTopBar
 import com.kidslab.physicsquest.ui.common.StarsRow
 
 @Composable
@@ -42,7 +43,7 @@ fun SoundScreen(
         modifier = Modifier.fillMaxSize().padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(state.title, style = MaterialTheme.typography.headlineMedium)
+        QuestTopBar(title = state.title, onBack = onBack)
         Text(state.instructions, style = MaterialTheme.typography.bodyLarge)
 
         Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))) {

@@ -30,6 +30,7 @@ interface PhysicsQuestRepository {
     fun observeWorlds(): Flow<List<World>>
     suspend fun getWorld(worldId: Long): World?
     fun observeLevelsForWorld(worldId: Long): Flow<List<Level>>
+    fun observeAllLevels(): Flow<List<Level>>
     suspend fun getLevel(levelId: Long): Level?
     suspend fun getObjectsForLevel(levelId: Long): List<LevelObject>
     suspend fun getRulesForLevel(levelId: Long): List<LevelRule>

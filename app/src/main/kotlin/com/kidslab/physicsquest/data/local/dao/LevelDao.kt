@@ -20,6 +20,9 @@ interface LevelDao {
     @Query("SELECT * FROM level WHERE worldId = :worldId ORDER BY levelNumberInWorld ASC")
     fun observeLevelsForWorld(worldId: Long): Flow<List<Level>>
 
+    @Query("SELECT * FROM level")
+    fun observeAll(): Flow<List<Level>>
+
     @Query("SELECT * FROM level WHERE id = :levelId")
     suspend fun getLevel(levelId: Long): Level?
 

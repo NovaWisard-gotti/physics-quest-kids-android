@@ -20,18 +20,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kidslab.physicsquest.ui.common.QuestTopBar
 import com.kidslab.physicsquest.ui.common.StarsRow
 
 @Composable
 fun WorldLevelsScreen(
     viewModel: WorldLevelsViewModel,
     onOpenLevel: (Long) -> Unit,
-    onOpenBoss: (Long) -> Unit
+    onOpenBoss: (Long) -> Unit,
+    onBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(state.world?.let { "Mundo ${it.order}: ${it.title}" } ?: "", style = MaterialTheme.typography.headlineMedium)
+        QuestTopBar(title = state.world?.let { "Mundo ${it.order}: ${it.title}" } ?: "", onBack = onBack)
         state.world?.let { Text(it.description, style = MaterialTheme.typography.bodyLarge) }
 
         if (state.loading) {
@@ -41,11 +43,14 @@ fun WorldLevelsScreen(
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             items(state.levels) { item ->
+                val containerColor = when {
+                    item.isBoss -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
+                    item.starsEarned > 0 -> com.kidslab.physicsquest.ui.theme.LeafGreen.copy(alpha = 0.12f)
+                    else -> MaterialTheme.colorScheme.surface
+                }
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (item.isBoss) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface
-                    ),
+                    colors = CardDefaults.cardColors(containerColor = containerColor),
                     onClick = { if (item.isBoss) onOpenBoss(item.level.id) else onOpenLevel(item.level.id) }
                 ) {
                     Row(
