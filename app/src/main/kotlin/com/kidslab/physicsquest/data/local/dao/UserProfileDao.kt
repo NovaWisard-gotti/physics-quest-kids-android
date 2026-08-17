@@ -21,6 +21,6 @@ interface UserProfileDao {
     @Query("UPDATE user_profile SET totalStars = :stars WHERE id = :id")
     suspend fun updateTotalStars(id: Long, stars: Int)
 
-    @Query("UPDATE user_profile SET shipPiecesRecovered = shipPiecesRecovered + 1 WHERE id = :id")
-    suspend fun incrementShipPieces(id: Long)
+    @Query("UPDATE user_profile SET shipPiecesRecovered = :pieces WHERE id = :id")
+    suspend fun updateShipPieces(id: Long, pieces: Int)
 }

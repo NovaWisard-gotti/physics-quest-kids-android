@@ -22,10 +22,30 @@ import kotlinx.coroutines.flow.Flow
 
 class PhysicsQuestRepositoryImpl(private val db: PhysicsQuestDatabase) : PhysicsQuestRepository {
 
+    private val worldBadgeIds = setOf(
+        SeedBadges.EXPLORADOR_MOVIMIENTO, SeedBadges.MAESTRO_PALANCA,
+        SeedBadges.INGENIERO_RAMPAS, SeedBadges.PILOTO_ENERGIA, SeedBadges.OIDO_DE_ORO
+    )
+
+    /**
+     * Recalcula por completo las piezas de nave a partir de las insignias de
+     * mundo que ya se tienen (una por mundo), en vez de ir sumando de a una:
+     * así también se autocorrigen los perfiles que quedaron "atascados" en 0
+     * por versiones anteriores de la app, apenas se vuelve a abrir o a jugar.
+     */
+    private suspend fun reconcileShipPieces(userProfileId: Long): Int {
+        val earned = worldBadgeIds.count { badgeId -> db.userBadgeDao().hasBadge(userProfileId, badgeId) }
+        db.userProfileDao().updateShipPieces(userProfileId, earned)
+        return earned
+    }
+
     override fun observeProfile(): Flow<UserProfile?> = db.userProfileDao().observeProfile()
 
     override suspend fun getOrCreateProfile(defaultName: String): UserProfile {
-        db.userProfileDao().getProfileOnce()?.let { return it }
+        db.userProfileDao().getProfileOnce()?.let { profile ->
+            reconcileShipPieces(profile.id)
+            return db.userProfileDao().getProfileOnce() ?: profile
+        }
         val id = db.userProfileDao().insert(
             UserProfile(explorerName = defaultName, createdAtEpochMillis = System.currentTimeMillis())
         )
@@ -160,16 +180,9 @@ class PhysicsQuestRepositoryImpl(private val db: PhysicsQuestDatabase) : Physics
         }
 
         // ¿Se ganaron las 5 insignias de mundo? -> insignia final (nave completa).
-        val worldBadgeIds = setOf(
-            SeedBadges.EXPLORADOR_MOVIMIENTO, SeedBadges.MAESTRO_PALANCA,
-            SeedBadges.INGENIERO_RAMPAS, SeedBadges.PILOTO_ENERGIA, SeedBadges.OIDO_DE_ORO
-        )
-        val earnedWorldBadges = worldBadgeIds.count { badgeId -> db.userBadgeDao().hasBadge(userProfileId, badgeId) }
+        val earnedWorldBadges = reconcileShipPieces(userProfileId)
         if (earnedWorldBadges >= worldBadgeIds.size) {
             awardBadgeIfNeeded(userProfileId, SeedBadges.HEROE_DE_FISICA_QUEST)
-            db.userProfileDao().getProfileOnce()?.let { p ->
-                if (p.id == userProfileId) db.userProfileDao().update(p.copy(shipPiecesRecovered = 5))
-            }
         }
     }
 
