@@ -28,7 +28,7 @@ internal object SeedLevelsMovimiento {
     private val configs = listOf(
         Cfg(
             1, "El primer despegue",
-            "Elige la dirección y la fuerza para que la sonda llegue a la primera meta.",
+            "Elige la dirección y la fuerza para que la pelota llegue a la primera meta.",
             0.45f to 0.78f, 0.09f, emptyList(), 3,
             listOf(
                 "Prueba un ángulo cercano a 45°: no muy plano, no muy vertical.",
@@ -37,7 +37,7 @@ internal object SeedLevelsMovimiento {
         ),
         Cfg(
             2, "Más lejos",
-            "La meta está más lejos. Ajusta la fuerza para que la sonda llegue más lejos.",
+            "La meta está más lejos. Ajusta la fuerza para que la pelota llegue más lejos.",
             0.62f to 0.65f, 0.08f, emptyList(), 3,
             listOf(
                 "Un ángulo un poco más alto que en el nivel anterior ayuda a ganar altura.",

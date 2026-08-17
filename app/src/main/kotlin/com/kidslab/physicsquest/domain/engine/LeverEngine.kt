@@ -25,11 +25,27 @@ object LeverEngine {
         val efficiencyMargin: Float = 0.6f
     )
 
-    fun evaluate(input: LeverInput, config: TargetConfig): PuzzleResult {
-        val rawLoadArm = abs(input.fulcrumPosition - config.loadPosition)
-        val rawEffortArm = abs(config.effortPosition - input.fulcrumPosition)
+    /**
+     * Fuerza mínima necesaria para levantar la carga con el punto de apoyo
+     * dado, o null si el apoyo está demasiado cerca de un extremo (posición
+     * degenerada). Se expone por separado del resultado del intento para que
+     * la pantalla pueda mostrar en vivo, mientras el niño mueve los
+     * controles, si la palanca "ya se levantaría" — sin duplicar la fórmula.
+     */
+    fun requiredEffort(fulcrumPosition: Float, config: TargetConfig): Float? {
+        val rawLoadArm = abs(fulcrumPosition - config.loadPosition)
+        val rawEffortArm = abs(config.effortPosition - fulcrumPosition)
+        if (rawLoadArm <= 0.01f || rawEffortArm <= 0.01f) return null
 
-        if (rawLoadArm <= 0.01f || rawEffortArm <= 0.01f) {
+        val fulcrum = fulcrumPosition.coerceIn(0.01f, 0.99f)
+        val loadArm = abs(fulcrum - config.loadPosition)
+        val effortArm = abs(config.effortPosition - fulcrum)
+        return (config.loadWeight * loadArm) / effortArm
+    }
+
+    fun evaluate(input: LeverInput, config: TargetConfig): PuzzleResult {
+        val requiredEffort = requiredEffort(input.fulcrumPosition, config)
+        if (requiredEffort == null) {
             return PuzzleResult(
                 success = false,
                 efficiencyScore = 0f,
@@ -37,11 +53,6 @@ object LeverEngine {
             )
         }
 
-        val fulcrum = input.fulcrumPosition.coerceIn(0.01f, 0.99f)
-        val loadArm = abs(fulcrum - config.loadPosition)
-        val effortArm = abs(config.effortPosition - fulcrum)
-
-        val requiredEffort = (config.loadWeight * loadArm) / effortArm
         val success = input.effortForce >= requiredEffort && input.effortForce <= 1f
 
         if (!success) {

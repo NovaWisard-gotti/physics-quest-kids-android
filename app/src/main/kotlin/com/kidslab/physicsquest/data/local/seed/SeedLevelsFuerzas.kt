@@ -22,18 +22,22 @@ internal object SeedLevelsFuerzas {
         val hints: List<String>
     )
 
+    // Márgenes de eficiencia más generosos y más intentos disponibles para
+    // la 2da estrella que en la v1: los niños de 8 años tardan en entender
+    // la ventaja mecánica de la palanca, así que el mundo debe perdonar más
+    // mientras aprenden, sin dejar de sentirse un desafío real.
     private val configs = listOf(
-        Cfg(1, "La primera carga", "Mueve el punto de apoyo para levantar la caja con poco esfuerzo.", 0.3f, 0.6f, 3,
+        Cfg(1, "La primera carga", "Mueve el punto de apoyo para levantar la caja con poco esfuerzo.", 0.3f, 0.85f, 3,
             listOf("Si acercas el punto de apoyo a la carga, necesitas menos fuerza.", "Prueba con el apoyo cerca del extremo izquierdo.")),
-        Cfg(2, "Un poco más pesada", "Esta caja pesa más. Encuentra el punto de apoyo correcto.", 0.5f, 0.55f, 3,
+        Cfg(2, "Un poco más pesada", "Esta caja pesa más. Encuentra el punto de apoyo correcto.", 0.5f, 0.8f, 3,
             listOf("El punto de apoyo debe estar más cerca de la carga que del explorador.", "Con el apoyo alrededor del 20% del camino suele alcanzar.")),
-        Cfg(3, "Piedra pesada", "Ahora es una piedra. ¡Usa la ventaja de la palanca!", 0.7f, 0.5f, 3,
+        Cfg(3, "Piedra pesada", "Ahora es una piedra. ¡Usa la ventaja de la palanca!", 0.7f, 0.75f, 3,
             listOf("Recuerda: brazo corto del lado de la carga, brazo largo del lado del esfuerzo.", "Ajusta el apoyo poco a poco hacia la izquierda.")),
-        Cfg(4, "El baúl del laboratorio", "El baúl es difícil de mover. Encuentra el equilibrio perfecto.", 0.9f, 0.45f, 3,
+        Cfg(4, "El baúl del laboratorio", "El baúl es difícil de mover. Encuentra el equilibrio perfecto.", 0.9f, 0.7f, 3,
             listOf("Cuanto más pesada la carga, más cerca debe estar el apoyo de ella.", "Prueba con el apoyo entre el 15% y el 25% del camino.")),
-        Cfg(5, "El bloque de metal", "Un bloque de metal muy pesado espera ser levantado.", 1.1f, 0.4f, 2,
+        Cfg(5, "El bloque de metal", "Un bloque de metal muy pesado espera ser levantado.", 1.1f, 0.65f, 3,
             listOf("Necesitarás un apoyo bastante cercano a la carga.", "Combina un apoyo cercano con una fuerza generosa.")),
-        Cfg(6, "Desafío: Profesor Torque", "El Profesor Torque preparó el bloque más pesado del taller.", 1.3f, 0.35f, 2,
+        Cfg(6, "Desafío: Profesor Torque", "El Profesor Torque preparó el bloque más pesado del taller.", 1.3f, 0.6f, 3,
             listOf("Este es el nivel más exigente: el apoyo debe estar muy cerca de la carga.", "Ajusta con cuidado: pequeños cambios en el apoyo cambian mucho el esfuerzo necesario."))
     )
 

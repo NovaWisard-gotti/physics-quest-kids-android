@@ -1,4 +1,4 @@
-# 🚀 Física Quest (Physics Quest)
+#  Física Quest (Physics Quest)
 
 **Física Quest** es un juego educativo de Android, 100% offline y en español,
 pensado para niñas y niños de 8 a 12 años. Convierte la física en una
@@ -13,7 +13,7 @@ nave científica, resolviendo puzzles que usan conceptos de física real
 - **Idioma:** Español (100%)
 - **Edad recomendada:** 8-12 años
 
-## 🌍 Los cinco mundos
+##  Los cinco mundos
 
 | # | Mundo | Concepto físico | Puzzle |
 |---|-------|------------------|--------|
@@ -27,7 +27,7 @@ Cada mundo tiene 6 niveles (30 en total): 5 niveles normales y 1 desafío de
 **jefe científico** que cierra el mundo. Al superarlo se recupera una pieza
 de la nave y se gana una insignia.
 
-## 🧩 Contenido del juego
+##  Contenido del juego
 
 - **30 niveles** jugables, definidos como datos (no hardcodeados en las pantallas).
 - **5 desafíos de jefe científico**, uno por mundo.
@@ -37,7 +37,7 @@ de la nave y se gana una insignia.
 - **Sistema de pistas**: se habilitan después de 2 intentos fallidos y nunca restan puntos.
 - **Sonido generado localmente**: el puzzle de Sonido sintetiza tonos puros en el propio dispositivo (sin archivos de audio ni internet).
 
-## 🏗️ Arquitectura y tecnología
+##  Arquitectura y tecnología
 
 - **Kotlin** + **Jetpack Compose** + **Canvas** para toda la interfaz.
 - **MVVM**: cada pantalla tiene su `ViewModel` con `StateFlow`.
@@ -55,7 +55,7 @@ de la nave y se gana una insignia.
 - **minSdk 24**, **compileSdk/targetSdk 34**, **JDK 17**, *core library
   desugaring* habilitado para `java.time`.
 
-## 📁 Estructura del proyecto
+##  Estructura del proyecto
 
 ```
 physics-quest-kids-android/
@@ -72,7 +72,7 @@ physics-quest-kids-android/
 └── SUBIR_A_GITHUB.md           # Guía paso a paso para subir el proyecto desde el navegador
 ```
 
-## 📚 Documentación
+##  Documentación
 
 - [`docs/MANUAL_TECNICO.md`](docs/MANUAL_TECNICO.md) — arquitectura, cómo añadir niveles, cómo compilar.
 - [`docs/MANUAL_USUARIO.md`](docs/MANUAL_USUARIO.md) — cómo jugar, pensado para niños, niñas y familias.
@@ -82,7 +82,7 @@ physics-quest-kids-android/
 - [`docs/pdf/`](docs/pdf/) — versión en PDF de los tres manuales principales.
 - [`SUBIR_A_GITHUB.md`](SUBIR_A_GITHUB.md) — cómo subir este proyecto a GitHub y publicar la primera Release.
 
-## 🔧 Compilar el proyecto
+##  Compilar el proyecto
 
 Este proyecto se generó en un entorno sin acceso a internet ni al SDK de
 Android, por lo que **no ha sido compilado dentro de esa sesión**. Para
@@ -99,7 +99,7 @@ compilarlo:
    `FisicaQuest-v1.0.0.apk` y publicará la Release **Física Quest v1.0.0**
    automáticamente.
 
-## ✅ Pruebas
+##  Pruebas
 
 El proyecto incluye pruebas unitarias para: trayectoria, fuerza, meta,
 palanca, plano inclinado, energía, sonido, estrellas, pistas, desbloqueo de
@@ -109,7 +109,7 @@ mundos y persistencia (con Room en memoria vía Robolectric). Se ejecutan con:
 gradle testDebugUnitTest
 ```
 
-## 📄 Licencia y créditos
+##  Licencia y créditos
 
 Proyecto educativo generado para **Wari** (Lima, Perú) como parte de una
 colección de apps educativas infantiles en español, 100% offline.

@@ -4,12 +4,20 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,8 +31,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kidslab.physicsquest.domain.engine.LeverEngine
 import com.kidslab.physicsquest.ui.common.AnimatedStarsRow
 import com.kidslab.physicsquest.ui.common.FeedbackBanner
 import com.kidslab.physicsquest.ui.common.HintButton
@@ -33,9 +45,11 @@ import com.kidslab.physicsquest.ui.common.QuestPrimaryButton
 import com.kidslab.physicsquest.ui.common.QuestTopBar
 import com.kidslab.physicsquest.ui.theme.CoralAccent
 import com.kidslab.physicsquest.ui.theme.DaySkyGradient
+import com.kidslab.physicsquest.ui.theme.LeafGreen
 import com.kidslab.physicsquest.ui.theme.SkyLight
 import com.kidslab.physicsquest.ui.theme.SpaceBluePrimary
 import com.kidslab.physicsquest.ui.theme.TextMuted
+import kotlin.math.sin
 
 @Composable
 fun LeverScreen(
@@ -52,11 +66,37 @@ fun LeverScreen(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .verticalScroll(rememberScrollState())
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             QuestTopBar(title = state.title, onBack = onBack, accentColor = SpaceBluePrimary)
             Text(state.instructions, style = MaterialTheme.typography.bodyLarge, color = TextMuted)
+
+            // Requerido en vivo (sin necesitar presionar el botón) para que el
+            // niño vea de inmediato si la palanca "ya se levantaría": la barra
+            // se inclina de verdad según la fuerza y el punto de apoyo actuales.
+            val config = state.config
+            val requiredEffort = config?.let { LeverEngine.requiredEffort(state.fulcrumPosition, it) }
+            val balance = when {
+                config == null -> 0f
+                requiredEffort == null -> -1f
+                else -> (state.effortForce - requiredEffort).coerceIn(-1f, 1f)
+            }
+            val tiltRad = (balance * 0.4f).coerceIn(-0.35f, 0.35f)
+
+            // Geometría de la barra en fracciones (0f..1f), calculada una sola
+            // vez fuera del Canvas para que tanto el dibujo como los emojis
+            // superpuestos usen exactamente los mismos puntos.
+            val leftXFrac = 0.08f
+            val rightXFrac = 0.92f
+            val barYFrac = 0.55f
+            val fulcrumXFrac = leftXFrac + (rightXFrac - leftXFrac) * state.fulcrumPosition
+            val leftYFrac = barYFrac - (fulcrumXFrac - leftXFrac) * sin(tiltRad)
+            val rightYFrac = barYFrac + (rightXFrac - fulcrumXFrac) * sin(tiltRad)
 
             Card(
                 modifier = Modifier.fillMaxWidth().aspectRatio(1.6f),
@@ -64,17 +104,42 @@ fun LeverScreen(
                 colors = CardDefaults.cardColors(containerColor = SkyLight),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Canvas(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                    val barY = size.height * 0.55f
-                    val leftX = size.width * 0.08f
-                    val rightX = size.width * 0.92f
-                    val fulcrumX = leftX + (rightX - leftX) * state.fulcrumPosition
+                BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        val barY = barYFrac * size.height
+                        val leftX = leftXFrac * size.width
+                        val rightX = rightXFrac * size.width
+                        val fulcrumX = fulcrumXFrac * size.width
+                        val leftY = leftYFrac * size.height
+                        val rightY = rightYFrac * size.height
 
-                    drawLine(SpaceBluePrimary, Offset(leftX, barY), Offset(rightX, barY), strokeWidth = 12f)
-                    drawCircle(CoralAccent, radius = 18f, center = Offset(fulcrumX, barY + 12f))
-                    drawCircle(SpaceBluePrimary, radius = 22f, center = Offset(leftX, barY - 22f))
-                    drawCircle(CoralAccent, radius = 18f, center = Offset(rightX, barY - 18f))
+                        // Cuña de apoyo (triángulo), fija bajo el punto de apoyo.
+                        val wedge = Path().apply {
+                            moveTo(fulcrumX - 20f, barY + 34f)
+                            lineTo(fulcrumX + 20f, barY + 34f)
+                            lineTo(fulcrumX, barY + 6f)
+                            close()
+                        }
+                        drawPath(wedge, CoralAccent)
+
+                        drawLine(SpaceBluePrimary, Offset(leftX, leftY), Offset(rightX, rightY), strokeWidth = 14f)
+                    }
+
+                    // Emojis en vez de círculos de color: la caja y el explorador
+                    // se ven como lo que realmente son en el enunciado.
+                    EmojiMarker("📦", fontSize = 28.sp, nx = leftXFrac, ny = leftYFrac - 0.06f)
+                    EmojiMarker("🧑‍🚀", fontSize = 26.sp, nx = rightXFrac, ny = rightYFrac - 0.06f)
                 }
+            }
+
+            val liveMessage = when {
+                config == null -> null
+                requiredEffort == null -> "🤔 El punto de apoyo está muy cerca de un extremo: muévelo hacia el centro."
+                balance >= 0f -> "💪 ¡Con esta posición y fuerza, la carga se levanta!"
+                else -> "⚖️ Todavía falta fuerza (o acercar más el apoyo a la caja)."
+            }
+            liveMessage?.let {
+                Text(it, style = MaterialTheme.typography.bodyMedium, color = if (balance >= 0f) LeafGreen else TextMuted, fontWeight = FontWeight.SemiBold)
             }
 
             Text("⚖️ Posición del punto de apoyo: ${(state.fulcrumPosition * 100).toInt()}%", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -114,4 +179,20 @@ fun LeverScreen(
             }
         }
     }
+}
+
+/** Posiciona un emoji sobre el Canvas usando coordenadas normalizadas (0f..1f), igual que el dibujo. */
+@Composable
+private fun BoxWithConstraintsScope.EmojiMarker(
+    emoji: String,
+    fontSize: TextUnit,
+    nx: Float,
+    ny: Float
+) {
+    val halfSize = (fontSize.value / 2).dp
+    Text(
+        emoji,
+        fontSize = fontSize,
+        modifier = Modifier.offset(x = maxWidth * nx - halfSize, y = maxHeight * ny - halfSize)
+    )
 }

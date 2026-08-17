@@ -4,12 +4,20 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,7 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kidslab.physicsquest.ui.common.AnimatedStarsRow
 import com.kidslab.physicsquest.ui.common.FeedbackBanner
 import com.kidslab.physicsquest.ui.common.HintButton
@@ -54,7 +64,11 @@ fun TrajectoryScreen(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .verticalScroll(rememberScrollState())
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             QuestTopBar(title = state.title, onBack = onBack, accentColor = SpaceBluePrimary)
@@ -67,23 +81,30 @@ fun TrajectoryScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 val config = state.config
-                Canvas(modifier = Modifier.fillMaxSize().padding(8.dp)) {
-                    if (config == null) return@Canvas
-                    fun toOffset(nx: Float, ny: Float) = Offset(nx * size.width, ny * size.height)
+                BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        if (config == null) return@Canvas
+                        fun toOffset(nx: Float, ny: Float) = Offset(nx * size.width, ny * size.height)
 
-                    val pathPoints = state.previewPath.map { toOffset(it.first, it.second) }
-                    for (i in 0 until pathPoints.size - 1) {
-                        drawLine(SpaceBluePrimary, pathPoints[i], pathPoints[i + 1], strokeWidth = 6f)
+                        val pathPoints = state.previewPath.map { toOffset(it.first, it.second) }
+                        for (i in 0 until pathPoints.size - 1) {
+                            drawLine(SpaceBluePrimary, pathPoints[i], pathPoints[i + 1], strokeWidth = 6f)
+                        }
+
+                        drawCircle(LeafGreen, radius = config.toleranceRadius * size.minDimension, center = toOffset(config.targetX, config.targetY), style = Stroke(width = 5f))
+                        drawCircle(LeafGreen.copy(alpha = 0.2f), radius = config.toleranceRadius * size.minDimension, center = toOffset(config.targetX, config.targetY))
                     }
 
-                    drawCircle(LeafGreen, radius = config.toleranceRadius * size.minDimension, center = toOffset(config.targetX, config.targetY), style = Stroke(width = 5f))
-                    drawCircle(LeafGreen.copy(alpha = 0.25f), radius = config.toleranceRadius * size.minDimension, center = toOffset(config.targetX, config.targetY))
-
-                    config.obstacles.forEach { (ox, oy) ->
-                        drawCircle(CoralAccent, radius = config.obstacleRadius * size.minDimension, center = toOffset(ox, oy))
+                    // Se superponen emojis en vez de puntos de color plano: la
+                    // pelota, las rocas y la meta representan lo mismo que
+                    // describe el enunciado, en lugar de ser figuras abstractas.
+                    if (config != null) {
+                        config.obstacles.forEach { (ox, oy) ->
+                            EmojiMarker("🪨", fontSize = 22.sp, nx = ox, ny = oy)
+                        }
+                        EmojiMarker("🚩", fontSize = 24.sp, nx = config.targetX, ny = config.targetY)
+                        EmojiMarker("⚽", fontSize = 26.sp, nx = config.launchX, ny = config.launchY)
                     }
-
-                    drawCircle(SpaceBluePrimary, radius = 16f, center = toOffset(config.launchX, config.launchY))
                 }
             }
 
@@ -124,4 +145,20 @@ fun TrajectoryScreen(
             }
         }
     }
+}
+
+/** Posiciona un emoji sobre el Canvas usando coordenadas normalizadas (0f..1f), igual que el dibujo. */
+@Composable
+private fun BoxWithConstraintsScope.EmojiMarker(
+    emoji: String,
+    fontSize: TextUnit,
+    nx: Float,
+    ny: Float
+) {
+    val halfSize = (fontSize.value / 2).dp
+    Text(
+        emoji,
+        fontSize = fontSize,
+        modifier = Modifier.offset(x = maxWidth * nx - halfSize, y = maxHeight * ny - halfSize)
+    )
 }
