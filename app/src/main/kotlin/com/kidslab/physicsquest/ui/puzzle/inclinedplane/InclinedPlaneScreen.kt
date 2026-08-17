@@ -1,5 +1,7 @@
 package com.kidslab.physicsquest.ui.puzzle.inclinedplane
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -88,9 +90,17 @@ fun InclinedPlaneScreen(
             val minRatio = ratios.minOrNull() ?: 1f
             val maxRatio = ratios.maxOrNull() ?: 1f
             val ratioSpan = (maxRatio - minRatio).coerceAtLeast(0.01f)
-            val horizFrac = selectedRamp?.let {
+            val targetHorizFrac = selectedRamp?.let {
                 0.2f + 0.6f * (((it.length / it.height.coerceAtLeast(0.01f)) - minRatio) / ratioSpan)
             } ?: 0.5f
+            // La rampa se anima suavemente hacia el nuevo ángulo al cambiar de
+            // opción, en vez de saltar de golpe, para que se sienta como un
+            // movimiento real y no como una foto distinta cada vez.
+            val horizFrac by animateFloatAsState(
+                targetValue = targetHorizFrac,
+                animationSpec = tween(500),
+                label = "rampTilt"
+            )
 
             Card(
                 modifier = Modifier.fillMaxWidth().aspectRatio(1.5f),
