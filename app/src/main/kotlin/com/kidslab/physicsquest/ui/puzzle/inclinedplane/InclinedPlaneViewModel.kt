@@ -56,7 +56,11 @@ class InclinedPlaneViewModel(
             val rampObjects = objects.filter { it.objectType == LevelObjectType.RAMPA }
             val maxEffort = rules.firstOrNull { it.ruleType == LevelRuleType.ESFUERZO_MAXIMO_DISPONIBLE }?.value1 ?: 0.6f
 
-            val ramps = rampObjects.map {
+            // El orden en pantalla se mezcla (no siempre corta/media/larga de
+            // arriba a abajo) para que la posición no delate la respuesta:
+            // así el niño tiene que fijarse en la longitud de cada rampa en
+            // vez de aprender "la de más abajo siempre es la correcta".
+            val ramps = rampObjects.shuffled().map {
                 RampOptionUi(objectId = it.id, label = it.extraLabel ?: "Rampa", length = it.extraValue ?: it.positionX, height = it.positionY)
             }
             val config = InclinedPlaneEngine.TargetConfig(

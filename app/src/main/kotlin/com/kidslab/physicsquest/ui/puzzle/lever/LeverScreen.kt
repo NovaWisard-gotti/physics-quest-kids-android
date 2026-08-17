@@ -125,9 +125,10 @@ fun LeverScreen(
                         drawLine(SpaceBluePrimary, Offset(leftX, leftY), Offset(rightX, rightY), strokeWidth = 14f)
                     }
 
-                    // Emojis en vez de círculos de color: la caja y el explorador
-                    // se ven como lo que realmente son en el enunciado.
-                    EmojiMarker("📦", fontSize = 28.sp, nx = leftXFrac, ny = leftYFrac - 0.06f)
+                    // Emojis en vez de círculos de color: la carga se ve como lo
+                    // que describe cada nivel (piedra, baúl, metal...), no
+                    // siempre la misma caja.
+                    EmojiMarker(loadEmojiFor(state.title, state.instructions), fontSize = 28.sp, nx = leftXFrac, ny = leftYFrac - 0.06f)
                     EmojiMarker("🧑‍🚀", fontSize = 26.sp, nx = rightXFrac, ny = rightYFrac - 0.06f)
                 }
             }
@@ -178,6 +179,18 @@ fun LeverScreen(
                 state.revealedHints.forEach { hint -> HintNote(hint) }
             }
         }
+    }
+}
+
+/** Elige un emoji acorde a lo que describe el nivel, en vez de usar siempre la misma caja. */
+private fun loadEmojiFor(title: String, instructions: String): String {
+    val text = "$title $instructions".lowercase()
+    return when {
+        "piedra" in text -> "🪨"
+        "baúl" in text -> "🧳"
+        "metal" in text -> "🧱"
+        "torque" in text -> "⚙️"
+        else -> "📦"
     }
 }
 

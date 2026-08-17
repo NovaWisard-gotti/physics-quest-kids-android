@@ -12,11 +12,17 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -302,5 +308,39 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier, accent: Color = Ma
                 .background(accent)
         )
         Text(text, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(start = 10.dp))
+    }
+}
+
+/**
+ * Barra fina que marca, dentro del rango total de un control (por ejemplo
+ * un [Slider]), la franja de valores que cuenta como correcta. Sin esto,
+ * un niño no tiene forma de saber si "todo a la izquierda" es la posición
+ * correcta o si el objetivo está más hacia el centro.
+ */
+@Composable
+fun RangeHint(
+    valueRange: ClosedFloatingPointRange<Float>,
+    targetRange: ClosedFloatingPointRange<Float>,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary
+) {
+    val totalSpan = (valueRange.endInclusive - valueRange.start).coerceAtLeast(0.0001f)
+    val startFrac = ((targetRange.start - valueRange.start) / totalSpan).coerceIn(0f, 1f)
+    val endFrac = ((targetRange.endInclusive - valueRange.start) / totalSpan).coerceIn(0f, 1f)
+    BoxWithConstraints(modifier.fillMaxWidth().height(10.dp)) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(5.dp))
+                .background(TextMuted.copy(alpha = 0.15f))
+        )
+        Box(
+            Modifier
+                .offset(x = maxWidth * startFrac)
+                .width(maxWidth * (endFrac - startFrac))
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(5.dp))
+                .background(color.copy(alpha = 0.55f))
+        )
     }
 }

@@ -34,8 +34,10 @@ import com.kidslab.physicsquest.ui.common.HintNote
 import com.kidslab.physicsquest.ui.common.QuestOutlinedButton
 import com.kidslab.physicsquest.ui.common.QuestPrimaryButton
 import com.kidslab.physicsquest.ui.common.QuestTopBar
+import com.kidslab.physicsquest.ui.common.RangeHint
 import com.kidslab.physicsquest.ui.theme.CoralAccent
 import com.kidslab.physicsquest.ui.theme.DaySkyGradient
+import com.kidslab.physicsquest.ui.theme.LeafGreen
 import com.kidslab.physicsquest.ui.theme.SunshineYellow
 import com.kidslab.physicsquest.ui.theme.SunshineYellowLight
 import com.kidslab.physicsquest.ui.theme.TextDark
@@ -86,6 +88,12 @@ fun SoundScreen(
                 }
             }
 
+            Text(
+                "🎯 La franja marcada abajo de cada control es la zona que abre la puerta.",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextMuted
+            )
+
             Text("🎵 Frecuencia (grave ↔ agudo)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Slider(
                 value = state.frequencyHz,
@@ -93,6 +101,14 @@ fun SoundScreen(
                 valueRange = 100f..2000f,
                 colors = SliderDefaults.colors(thumbColor = CoralAccent, activeTrackColor = CoralAccent)
             )
+            state.config?.let { config ->
+                RangeHint(
+                    valueRange = 100f..2000f,
+                    targetRange = config.minFrequencyHz..config.maxFrequencyHz,
+                    color = CoralAccent,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
 
             Text("📢 Amplitud (suave ↔ fuerte)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Slider(
@@ -101,6 +117,13 @@ fun SoundScreen(
                 valueRange = 0f..1f,
                 colors = SliderDefaults.colors(thumbColor = SunshineYellow, activeTrackColor = SunshineYellow)
             )
+            state.config?.let { config ->
+                RangeHint(
+                    valueRange = 0f..1f,
+                    targetRange = config.minAmplitude..config.maxAmplitude,
+                    color = LeafGreen
+                )
+            }
 
             QuestOutlinedButton(
                 text = "Escuchar sonido",
