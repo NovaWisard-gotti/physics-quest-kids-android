@@ -1,5 +1,10 @@
 package com.kidslab.physicsquest.ui.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,6 +29,7 @@ import com.kidslab.physicsquest.ui.map.MapScreen
 import com.kidslab.physicsquest.ui.map.MapViewModel
 import com.kidslab.physicsquest.ui.map.WorldLevelsScreen
 import com.kidslab.physicsquest.ui.map.WorldLevelsViewModel
+import com.kidslab.physicsquest.ui.profile.DEFAULT_EXPLORER_NAME
 import com.kidslab.physicsquest.ui.profile.ProfileScreen
 import com.kidslab.physicsquest.ui.profile.ProfileViewModel
 import com.kidslab.physicsquest.ui.puzzle.energy.EnergyScreen
@@ -70,7 +76,7 @@ fun PhysicsQuestNavHost(repository: PhysicsQuestRepository) {
     // evitando bloquear el hilo principal. La pantalla de Perfil siempre se muestra
     // primero y garantiza que el perfil ya existe antes de navegar al resto de la app.
     val profileState = produceState<Long?>(initialValue = null) {
-        value = repository.getOrCreateProfile("Explorador/a").id
+        value = repository.getOrCreateProfile(DEFAULT_EXPLORER_NAME).id
     }
     val userProfileId = profileState.value
 
@@ -79,7 +85,17 @@ fun PhysicsQuestNavHost(repository: PhysicsQuestRepository) {
         return
     }
 
-    NavHost(navController = navController, startDestination = Routes.PROFILE) {
+    // Transiciones suaves de deslizamiento/desvanecimiento entre pantallas: le dan
+    // a la navegación una sensación mucho más "de videojuego" que el corte seco
+    // por defecto, sin necesitar animaciones distintas en cada composable.
+    NavHost(
+        navController = navController,
+        startDestination = Routes.PROFILE,
+        enterTransition = { slideInHorizontally(tween(320)) { it / 4 } + fadeIn(tween(320)) },
+        exitTransition = { fadeOut(tween(200)) },
+        popEnterTransition = { fadeIn(tween(260)) },
+        popExitTransition = { slideOutHorizontally(tween(280)) { it / 4 } + fadeOut(tween(280)) }
+    ) {
         composable(Routes.PROFILE) {
             val vm: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(repository))
             ProfileScreen(viewModel = vm, onStartAdventure = {

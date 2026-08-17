@@ -9,6 +9,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/** Nombre "de fábrica" del perfil: nunca se le muestra al niño como texto ya
+ * escrito, sólo como sugerencia (placeholder) en el campo mientras esté vacío. */
+const val DEFAULT_EXPLORER_NAME = "Explorador/a"
+
 data class ProfileUiState(
     val loading: Boolean = true,
     val profile: UserProfile? = null,
@@ -22,8 +26,11 @@ class ProfileViewModel(private val repository: PhysicsQuestRepository) : ViewMod
     init {
         viewModelScope.launch {
             repository.ensureSeeded()
-            val profile = repository.getOrCreateProfile("Explorador/a")
-            _uiState.value = ProfileUiState(loading = false, profile = profile, editingName = profile.explorerName)
+            val profile = repository.getOrCreateProfile(DEFAULT_EXPLORER_NAME)
+            // Si el niño todavía no eligió un nombre propio, el campo arranca
+            // vacío y "Explorador/a" se muestra solo como marca de agua.
+            val startingName = if (profile.explorerName == DEFAULT_EXPLORER_NAME) "" else profile.explorerName
+            _uiState.value = ProfileUiState(loading = false, profile = profile, editingName = startingName)
         }
     }
 
