@@ -72,22 +72,7 @@ physics-quest-kids-android/
 └── SUBIR_A_GITHUB.md           # Guía paso a paso para subir el proyecto desde el navegador
 ```
 
-##  Compilar el proyecto
 
-Este proyecto se generó en un entorno sin acceso a internet ni al SDK de
-Android, por lo que **no ha sido compilado dentro de esa sesión**. Para
-compilarlo:
-
-1. Abre la carpeta `physics-quest-kids-android` en Android Studio (Koala o
-   posterior). Android Studio detectará el proyecto Gradle y descargará las
-   dependencias automáticamente (necesitas conexión a internet la primera vez).
-2. O bien, compílalo desde GitHub Actions: cada `push` a `main` ejecuta el
-   flujo `CI - Física Quest`, que compila el APK de depuración, corre las
-   pruebas y el análisis de Lint.
-3. Para generar una Release firmable, crea una etiqueta `vX.Y.Z` (por
-   ejemplo `v1.0.0`) y el flujo `Release - Física Quest` compilará el APK
-   `FisicaQuest-v1.0.0.apk` y publicará la Release **Física Quest v1.0.0**
-   automáticamente.
 
 ##  Pruebas
 
@@ -98,8 +83,3 @@ mundos y persistencia (con Room en memoria vía Robolectric). Se ejecutan con:
 ```
 gradle testDebugUnitTest
 ```
-
-##  Licencia y créditos
-
-Proyecto educativo generado para **Wari** (Lima, Perú) como parte de una
-colección de apps educativas infantiles en español, 100% offline.
