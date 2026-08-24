@@ -72,16 +72,6 @@ physics-quest-kids-android/
 └── SUBIR_A_GITHUB.md           # Guía paso a paso para subir el proyecto desde el navegador
 ```
 
-##  Documentación
-
-- [`docs/MANUAL_TECNICO.md`](docs/MANUAL_TECNICO.md) — arquitectura, cómo añadir niveles, cómo compilar.
-- [`docs/MANUAL_USUARIO.md`](docs/MANUAL_USUARIO.md) — cómo jugar, pensado para niños, niñas y familias.
-- [`docs/GUIA_PEDAGOGICA.md`](docs/GUIA_PEDAGOGICA.md) — guía para docentes: objetivos de aprendizaje por mundo.
-- [`docs/BASE_DE_DATOS.md`](docs/BASE_DE_DATOS.md) — esquema completo de la base de datos, con diagrama ER en Mermaid.
-- [`docs/sql/schema.sql`](docs/sql/schema.sql) — el esquema anterior en SQL.
-- [`docs/pdf/`](docs/pdf/) — versión en PDF de los tres manuales principales.
-- [`SUBIR_A_GITHUB.md`](SUBIR_A_GITHUB.md) — cómo subir este proyecto a GitHub y publicar la primera Release.
-
 ##  Compilar el proyecto
 
 Este proyecto se generó en un entorno sin acceso a internet ni al SDK de
